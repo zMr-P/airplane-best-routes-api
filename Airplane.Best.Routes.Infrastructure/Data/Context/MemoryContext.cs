@@ -28,8 +28,7 @@ namespace Airplane.Best.Routes.Infrastructure.Data.Context
 
             var solutionDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
 
-            var jsonRoutesFilePath = Path.Combine(solutionDirectory, "Airplane.Best.Routes.Api", "Airplane.Best.Routes.Infrastructure", "Data", "Created", "routes-seed.json");
-
+            var jsonRoutesFilePath = Path.Combine(solutionDirectory, "airplane-best-routes-api", "Airplane.Best.Routes.Infrastructure", "Data", "Created", "routes-seed.json");
             if (File.Exists(jsonRoutesFilePath))
             {
                 var jsonRoutes = File.ReadAllText(jsonRoutesFilePath);
@@ -52,7 +51,7 @@ namespace Airplane.Best.Routes.Infrastructure.Data.Context
                 }
             }
 
-            var jsonConnectionsFilePath = Path.Combine(solutionDirectory, "Airplane.Best.Routes.Api", "Airplane.Best.Routes.Infrastructure", "Data", "Created", "connections-seed.json");
+            var jsonConnectionsFilePath = Path.Combine(solutionDirectory, "airplane-best-routes-api", "Airplane.Best.Routes.Infrastructure", "Data", "Created", "connections-seed.json");
             if (File.Exists(jsonConnectionsFilePath))
             {
                 var jsonConnections = File.ReadAllText(jsonConnectionsFilePath);
