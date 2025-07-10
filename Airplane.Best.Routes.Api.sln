@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36203.30
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airplane.Best.Routes.Domain", "Airplane.Best.Routes.Domain\Airplane.Best.Routes.Domain.csproj", "{22E65EE2-CBEA-4056-845E-2D3DCC8C8B7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airplane.Best.Routes.Infrastructure", "Airplane.Best.Routes.Infrastructure\Airplane.Best.Routes.Infrastructure.csproj", "{F3F928DD-0A1C-4AFD-B8D6-B3474B977E3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airplane.Best.Routes.Application", "Airplane.Best.Routes.Application\Airplane.Best.Routes.Application.csproj", "{6DD578CD-8F9A-4C8E-A9AA-3339DABC85C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airplane.Best.Routes.Infrastructure.Ioc", "Airplane.Best.Routes.Infrastructure.Ioc\Airplane.Best.Routes.Infrastructure.Ioc.csproj", "{8CA4EAE7-44EF-4A63-9457-4D0C434FEC27}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution-Items", "Solution-Items", "{380A7511-A354-6D7A-0CC0-8FA1F1BA7B6C}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airplane.Best.Routes.Api", "Airplane.Best.Routes.Api\Airplane.Best.Routes.Api.csproj", "{A81A2F25-B1CF-4C6D-3EF2-BE0824C4C3DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22E65EE2-CBEA-4056-845E-2D3DCC8C8B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22E65EE2-CBEA-4056-845E-2D3DCC8C8B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22E65EE2-CBEA-4056-845E-2D3DCC8C8B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22E65EE2-CBEA-4056-845E-2D3DCC8C8B7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F928DD-0A1C-4AFD-B8D6-B3474B977E3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F928DD-0A1C-4AFD-B8D6-B3474B977E3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F928DD-0A1C-4AFD-B8D6-B3474B977E3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F928DD-0A1C-4AFD-B8D6-B3474B977E3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD578CD-8F9A-4C8E-A9AA-3339DABC85C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD578CD-8F9A-4C8E-A9AA-3339DABC85C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD578CD-8F9A-4C8E-A9AA-3339DABC85C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD578CD-8F9A-4C8E-A9AA-3339DABC85C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CA4EAE7-44EF-4A63-9457-4D0C434FEC27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CA4EAE7-44EF-4A63-9457-4D0C434FEC27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CA4EAE7-44EF-4A63-9457-4D0C434FEC27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CA4EAE7-44EF-4A63-9457-4D0C434FEC27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A81A2F25-B1CF-4C6D-3EF2-BE0824C4C3DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A81A2F25-B1CF-4C6D-3EF2-BE0824C4C3DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A81A2F25-B1CF-4C6D-3EF2-BE0824C4C3DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A81A2F25-B1CF-4C6D-3EF2-BE0824C4C3DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F2E9D212-5E87-47C5-A84C-EB9E2C27DF03}
+	EndGlobalSection
+EndGlobal
