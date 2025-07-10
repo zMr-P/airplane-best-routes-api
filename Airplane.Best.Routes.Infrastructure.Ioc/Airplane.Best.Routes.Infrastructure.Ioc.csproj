@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Airplane.Best.Routes.Application\Airplane.Best.Routes.Application.csproj" />
+    <ProjectReference Include="..\Airplane.Best.Routes.Domain\Airplane.Best.Routes.Domain.csproj" />
+    <ProjectReference Include="..\Airplane.Best.Routes.Infrastructure\Airplane.Best.Routes.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
