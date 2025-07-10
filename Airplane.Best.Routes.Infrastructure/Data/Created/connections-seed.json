@@ -1,0 +1,34 @@
+[
+  {
+    "Id": "f89dcbf7-36aa-4263-af8e-734a264470a5",
+    "RouteId": "4c110b7d-03ad-4269-8a80-dcb2a76d380f",
+    "Name": "BRC"
+  },
+  {
+    "Id": "8e308abf-3f70-4a24-8b5f-fdf2907d02e1",
+    "RouteId": "4c110b7d-03ad-4269-8a80-dcb2a76d380f",
+    "Name": "SCL"
+  },
+  {
+    "Id": "e7c15456-c7c4-4f99-a043-b35958f85945",
+    "RouteId": "4c110b7d-03ad-4269-8a80-dcb2a76d380f",
+    "Name": "ORL"
+  },
+
+  {
+    "Id": "a3d9a4aa-e891-4cfa-b55f-6b18be8fa771",
+    "RouteId": "4e9fa6aa-8c3b-4c91-b3fd-156c46b8477d",
+    "Name": "ORL"
+  },
+
+  {
+    "Id": "d60c9ed8-cc16-4d5f-b7a3-6d3368f22f42",
+    "RouteId": "13f61c34-8122-4b5d-a27c-9780f1b2b6e7",
+    "Name": "SCL"
+  },
+  {
+    "Id": "3e6e822a-bd89-4378-937e-7c4cf9cb5e64",
+    "RouteId": "13f61c34-8122-4b5d-a27c-9780f1b2b6e7",
+    "Name": "ORL"
+  }
+]

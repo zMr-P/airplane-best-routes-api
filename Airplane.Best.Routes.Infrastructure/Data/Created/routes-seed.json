@@ -1,0 +1,72 @@
+[
+  {
+    "Id": "a75c19b3-6d5f-4df2-8f3c-1e324172a650",
+    "OriginName": "GRU",
+    "DestinationName": "CDG",
+    "IsAvaiable": true,
+    "Value": 75
+  },
+  {
+    "Id": "4e9fa6aa-8c3b-4c91-b3fd-156c46b8477d",
+    "OriginName": "GRU",
+    "DestinationName": "CDG",
+    "IsAvaiable": true,
+    "Value": 61
+  },
+  {
+    "Id": "4c110b7d-03ad-4269-8a80-dcb2a76d380f",
+    "OriginName": "GRU",
+    "DestinationName": "CDG",
+    "IsAvaiable": true,
+    "Value": 40
+  },
+  {
+    "Id": "13f61c34-8122-4b5d-a27c-9780f1b2b6e7",
+    "OriginName": "GRU",
+    "DestinationName": "CDG",
+    "IsAvaiable": true,
+    "Value": 45
+  },
+  {
+    "Id": "7cfa2a77-58c3-47d4-a207-d70901fd7462",
+    "OriginName": "GRU",
+    "DestinationName": "BRC",
+    "IsAvaiable": true,
+    "Value": 10
+  },
+  {
+    "Id": "e70af042-23fc-4f3c-8b82-87340ed65b49",
+    "OriginName": "BRC",
+    "DestinationName": "SCL",
+    "IsAvaiable": true,
+    "Value": 5
+  },
+  {
+    "Id": "463a481c-6c6d-482f-9e96-ec18a4a514e8",
+    "OriginName": "GRU",
+    "DestinationName": "SCL",
+    "IsAvaiable": true,
+    "Value": 20
+  },
+  {
+    "Id": "d546e5a9-e6e3-423b-b2af-fffd4d2e0847",
+    "OriginName": "GRU",
+    "DestinationName": "ORL",
+    "IsAvaiable": true,
+    "Value": 56
+  },
+  {
+    "Id": "13d15e12-afd5-4e2c-956a-f7ac1faeeb83",
+    "OriginName": "ORL",
+    "DestinationName": "CDG",
+    "IsAvaiable": true,
+    "Value": 5
+  },
+  {
+    "Id": "ee4fae26-d3c1-4b0a-bd09-981e36495f61",
+    "OriginName": "SCL",
+    "DestinationName": "ORL",
+    "IsAvaiable": true,
+    "Value": 20
+  }
+]
