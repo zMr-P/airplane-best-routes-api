@@ -1,10 +1,19 @@
-# Rota de Viagem #
-Escolha a rota de viagem mais barata independente da quantidade de conexıes.
+Ôªø# Rota de Viagem #
+Escolha a rota de viagem mais barata independente da quantidade de conex√µes.
 Para isso precisamos inserir as rotas.
+
+## üîß Projeto de Inicializa√ß√£o
+
+O projeto principal √© `Airplane.Best.Routes.API`. Ao abrir a solu√ß√£o (`.sln`), confira se o Visual Studio o selecionou como projeto de inicializa√ß√£o.
+
+Se usar CLI:
+```bash
+dotnet run --project Airplane.Best.Routes.Api
+```
 
 # API
 ## CRUD de cadastro de ROTAS ##
-* Dever· construir um endpoint de CRUD as rotas disponÌveis:
+* Dever√° construir um endpoint de CRUD as rotas dispon√≠veis:
 ```
 Origem: GRU, Destino: BRC, Valor: 10
 Origem: BRC, Destino: SCL, Valor: 5
@@ -23,21 +32,21 @@ Uma viajem de **GRU** para **CDG** existem as seguintes rotas:
 3. GRU - CDG ao custo de $75
 4. GRU - SCL - ORL - CDG ao custo de $45
 
-O melhor preÁo È da rota **1**, apesar de mais conexıes, seu valor final È menor.
+O melhor pre√ßo √© da rota **1**, apesar de mais conex√µes, seu valor final √© menor.
 O resultado da consulta deve ser: **GRU - BRC - SCL - ORL - CDG ao custo de $40**.
 
-Sendo assim, o endpoint de consulta dever· efetuar o calculo de melhor rota.
+Sendo assim, o endpoint de consulta dever√° efetuar o calculo de melhor rota.
 
 # API .net core
 1- Cadastro: CRUD de Rotas
-2- Consulta: Dever· ter 2 campos para consulta de rota: **Origem-Destino** e exibir o resultado da consulta chamando a API
+2- Consulta: Dever√° ter 2 campos para consulta de rota: **Origem-Destino** e exibir o resultado da consulta chamando a API
 	
-- Interface Rest (ObrigatÛrio)
-    A interface Rest dever· suportar o CRUD de rotas:
-    - ManipulaÁ„o de rotas, dados podendo ser persistidos em arquivo, bd local, etc...
+- Interface Rest (Obrigat√≥rio)
+    A interface Rest dever√° suportar o CRUD de rotas:
+    - Manipula√ß√£o de rotas, dados podendo ser persistidos em arquivo, bd local, etc...
     - Consulta de melhor rota entre dois pontos.
 	- Documento swagger
-	- Testes unit·rios
+	- Testes unit√°rios
 	
   Exemplo:
   ```
