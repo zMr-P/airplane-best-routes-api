@@ -1,7 +1,11 @@
 ﻿using Airplane.Best.Routes.Domain.Entities;
 using Airplane.Best.Routes.Domain.Interfaces.Context;
+using Airplane.Best.Routes.Domain.Interfaces.Repositories;
+using Airplane.Best.Routes.Infrastructure.Data.Context;
 using Airplane.Best.Routes.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 using MockQueryable.Moq;
 using Moq;
 
@@ -10,12 +14,14 @@ namespace Airplane.Best.Routes.Api.UnitTests.Repository
     public class RouteRepositoryTest
     {
         private readonly Mock<IMemoryContext> _memoryContextMock;
+        private readonly Mock<ILogger<RouteRepository>> _loggerMock;
         private readonly RouteRepository _routeRepository;
 
         public RouteRepositoryTest()
         {
             _memoryContextMock = new Mock<IMemoryContext>();
-            _routeRepository = new RouteRepository(_memoryContextMock.Object);
+            _loggerMock = new Mock<ILogger<RouteRepository>>();
+            _routeRepository = new RouteRepository(_memoryContextMock.Object, _loggerMock.Object);
         }
 
         [Fact]
@@ -86,70 +92,6 @@ namespace Airplane.Best.Routes.Api.UnitTests.Repository
         }
 
         [Fact]
-        public async Task UpdateAsync_ShouldUpdateRouteAndConnections()
-        {
-            // Arrange
-            var routeId = Guid.NewGuid();
-            var oldConnectionId = Guid.NewGuid();
-
-            var existingRoute = new Route
-            {
-                Id = routeId,
-                OriginName = "GRU",
-                DestinationName = "BRC",
-                IsAvaiable = true,
-                Value = 50,
-                Connections = new List<Connection>
-                {
-                    new Connection { Id = oldConnectionId, Name = "SCL", RouteId = routeId }
-                }
-            };
-
-            var updatedRoute = new Route
-            {
-                OriginName = "GRU",
-                DestinationName = "CDG",
-                Value = 99,
-                Connections = new List<Connection>
-                {
-                    new Connection { Name = "ORL" },
-                    new Connection { Name = "CDG" }
-                }
-            };
-
-            // Simula retorno de Routes como IQueryable para permitir buscas com LINQ
-            var routeQuery = new List<Route> { existingRoute }.AsQueryable();
-            var mockRouteDbSet = routeQuery.BuildMockDbSet();
-
-
-            var mockConnectionDbSet = new Mock<DbSet<Connection>>();
-            mockConnectionDbSet.Setup(m => m.Remove(It.IsAny<Connection>()));
-            mockConnectionDbSet.Setup(m => m.Add(It.IsAny<Connection>()));
-
-            _memoryContextMock.Setup(m => m.Routes).Returns(mockRouteDbSet.Object);
-            _memoryContextMock.Setup(m => m.Connections).Returns(mockConnectionDbSet.Object);
-            _memoryContextMock.Setup(m => m.SaveChangesAsync()).ReturnsAsync(1);
-
-            // Act
-            var result = await _routeRepository.UpdateAsync(routeId, updatedRoute);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("CDG", result.DestinationName);
-            Assert.Equal(99, result.Value);
-            Assert.Equal(2, result.Connections.Count);
-            Assert.All(result.Connections, c => Assert.NotEqual(Guid.Empty, c.Id));
-            Assert.All(result.Connections, c => Assert.Equal(routeId, c.RouteId));
-            Assert.Contains(result.Connections, c => c.Name == "ORL");
-            Assert.Contains(result.Connections, c => c.Name == "CDG");
-
-            mockConnectionDbSet.Verify(m => m.Remove(It.Is<Connection>(c => c.Id == oldConnectionId)), Times.Once);
-            mockConnectionDbSet.Verify(m => m.Add(It.Is<Connection>(c => c.Name == "ORL")), Times.Once);
-            mockConnectionDbSet.Verify(m => m.Add(It.Is<Connection>(c => c.Name == "CDG")), Times.Once);
-            _memoryContextMock.Verify(m => m.SaveChangesAsync(), Times.Once);
-        }
-
-        [Fact]
         public async Task DeleteAsync_ShouldRemoveRouteAndReturnTrue_WhenRouteExists()
         {
             // Arrange
@@ -164,7 +106,6 @@ namespace Airplane.Best.Routes.Api.UnitTests.Repository
                 Value = 75
             };
 
-            // Simula retorno de Routes como IQueryable para permitir buscas com LINQ
             var routeQuery = new List<Route> { routeToDelete }.AsQueryable();
             var mockRouteDbSet = routeQuery.BuildMockDbSet();
 
@@ -173,7 +114,7 @@ namespace Airplane.Best.Routes.Api.UnitTests.Repository
             mockRouteDbSet.Setup(m => m.Remove(It.IsAny<Route>()));
 
             // Act
-            var result = await _routeRepository.DeleteAsync(routeId);
+            var result = await _routeRepository.DeleteAsync(routeToDelete);
 
             // Assert
             Assert.True(result);

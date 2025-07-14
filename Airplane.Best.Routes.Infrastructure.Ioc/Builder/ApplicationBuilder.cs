@@ -1,5 +1,6 @@
 ﻿using Airplane.Best.Routes.Infrastructure.Data.Context;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Airplane.Best.Routes.Infrastructure.Ioc.Builder

@@ -1,7 +1,9 @@
-﻿using Airplane.Best.Routes.Application.Interfaces;
+﻿using Airplane.Best.Routes.Application.Application;
+using Airplane.Best.Routes.Application.Interfaces;
 using Airplane.Best.Routes.Application.Services;
 using Airplane.Best.Routes.Domain.Interfaces.Context;
 using Airplane.Best.Routes.Domain.Interfaces.Repositories;
+using Airplane.Best.Routes.Domain.Interfaces.Services;
 using Airplane.Best.Routes.Infrastructure.Data.Context;
 using Airplane.Best.Routes.Infrastructure.Repositories;
 using Asp.Versioning;
@@ -21,17 +23,25 @@ namespace Airplane.Best.Routes.Infrastructure.Ioc.Extensions
             return services;
         }
 
-        public static IServiceCollection SetRepositoriesConfig(this IServiceCollection services)
+        public static IServiceCollection SetApplicationConfig(this IServiceCollection services)
         {
-            services.AddScoped<IRouteRepository, RouteRepository>();
+            services.AddScoped<IBestRoutesApplication, BestRoutesApplication>();
             return services;
         }
 
         public static IServiceCollection SetServicesConfig(this IServiceCollection services)
         {
-            services.AddScoped<IRouteService, RouteService>();
+            services.AddScoped<IBestRouteService, BestRouteService>();
             return services;
         }
+
+        public static IServiceCollection SetRepositoriesConfig(this IServiceCollection services)
+        {
+            services.AddScoped<IRouteRepository, RouteRepository>();
+            services.AddScoped<IConnectionRepository, ConnectionRepository>();
+            return services;
+        }
+
 
         public static IServiceCollection SetVersioningConfig(this IServiceCollection services)
         {
@@ -61,7 +71,7 @@ namespace Airplane.Best.Routes.Infrastructure.Ioc.Extensions
                 {
                     Title = "Airplane Best Routes API",
                     Version = "v1",
-                    Description = "API for managing and retrieving the best routes for airplanes."
+                    Description = "API para manutenção e recuperação das melhores rotas de viagem."
                 });
             });
             return services;

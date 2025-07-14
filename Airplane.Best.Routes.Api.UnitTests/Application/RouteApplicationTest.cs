@@ -1,20 +1,25 @@
-﻿using Airplane.Best.Routes.Application.Dtos.RouteService.Request;
-using Airplane.Best.Routes.Application.Services;
+﻿using Airplane.Best.Routes.Application.Application;
+using Airplane.Best.Routes.Application.Dtos.RouteService.Request;
+using Airplane.Best.Routes.Application.Dtos.RouteService.Response;
 using Airplane.Best.Routes.Domain.Entities;
-using Airplane.Best.Routes.Domain.Interfaces.Repositories;
+using Airplane.Best.Routes.Domain.Interfaces.Services;
+using Airplane.Best.Routes.Domain.Messages;
+using Airplane.Best.Routes.Domain.Models;
+using Mapster;
 using Moq;
+using Xunit.Sdk;
 
-namespace Airplane.Best.Routes.Api.UnitTests.Service
+namespace Airplane.Best.Routes.Api.UnitTests.Application
 {
-    public class RouteServiceTest
+    public class RouteApplicationTest
     {
-        private readonly Mock<IRouteRepository> _routeRepositoryMock;
-        private readonly RouteService _routeService;
+        private readonly Mock<IBestRouteService> _bestRouteServiceMock;
+        private readonly BestRoutesApplication _bestRoutesApplication;
 
-        public RouteServiceTest()
+        public RouteApplicationTest()
         {
-            _routeRepositoryMock = new Mock<IRouteRepository>();
-            _routeService = new RouteService(_routeRepositoryMock.Object);
+            _bestRouteServiceMock = new Mock<IBestRouteService>();
+            _bestRoutesApplication = new BestRoutesApplication(_bestRouteServiceMock.Object);
         }
 
         [Fact]
@@ -28,11 +33,11 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
                 new Route { Id = Guid.NewGuid(), OriginName = "GRU", DestinationName = "SCL", Value  = 50}
             };
 
-            _routeRepositoryMock.Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.GetAllRoutesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(routes);
 
             // Act
-            var result = await _routeService.GetAllRoutesAsync(CancellationToken.None);
+            var result = await _bestRoutesApplication.GetAllRoutesAsync(CancellationToken.None);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -43,34 +48,36 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
         public async Task GetAllRoutesAsync_ShouldReturnError_WhenNoRoutesExist()
         {
             // Arrange
-            _routeRepositoryMock.Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.GetAllRoutesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Route>());
 
             // Act
-            var result = await _routeService.GetAllRoutesAsync(CancellationToken.None);
+            var result = await _bestRoutesApplication.GetAllRoutesAsync(CancellationToken.None);
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Empty(result.Data);
-            Assert.Contains("Nenhuma rota encontrada.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.NoRoutesFound, result.ErrorMessages);
         }
 
         [Fact]
         public async Task GetRangeRoutesAsync_ShouldReturnRoutes_WhenRoutesExist()
         {
             // Arrange
-            var request = new GetRoutesRequest { Origin = "GRU", Destination = "CDG" };
+            var request = new GetRoutesRequestDto { Origin = "GRU", Destination = "CDG" };
+            var requestModel = request.Adapt<GetRoutesModel>();
+
             var routes = new List<Route>
             {
                 new Route { Id = Guid.NewGuid(), OriginName = "GRU", DestinationName = "CDG", Value = 40 },
                 new Route { Id = Guid.NewGuid(), OriginName = "GRU", DestinationName = "CDG", Value  = 30},
             };
 
-            _routeRepositoryMock.Setup(repo => repo.GetRangeAsync(request.Origin, request.Destination, It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.GetRangeRoutesAsync(It.IsAny<GetRoutesModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(routes);
 
             // Act
-            var result = await _routeService.GetRangeRoutesAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.GetRangeRoutesAsync(request, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -81,68 +88,72 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
         public async Task GetRangeRoutesAsync_ShouldReturnError_WhenNoRoutesExist()
         {
             // Arrange
-            var request = new GetRoutesRequest { Origin = "GRU", Destination = "CDG" };
+            var request = new GetRoutesRequestDto { Origin = "GRU", Destination = "CDG" };
+            var requestModel = request.Adapt<GetRoutesModel>();
 
-            _routeRepositoryMock.Setup(repo => repo.GetRangeAsync(request.Origin, request.Destination, It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.GetRangeRoutesAsync(requestModel, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Route>());
 
             // Act
-            var result = await _routeService.GetRangeRoutesAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.GetRangeRoutesAsync(request, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Empty(result.Data);
-            Assert.Contains("Nenhuma rota encontrada.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.NoRoutesFound, result.ErrorMessages);
         }
 
         [Fact]
         public async Task GetBestRouteAsync_ShouldReturnBestRoute_WhenRouteExists()
         {
             // Arrange
-            var request = new GetRoutesRequest { Origin = "GRU", Destination = "CDG" };
-            var bestRoute = new Route { Id = Guid.NewGuid(), OriginName = "GRU", DestinationName = "CDG", Value = 30 };
+            var request = new GetRoutesRequestDto { Origin = "GRU", Destination = "CDG" };
 
-            _routeRepositoryMock.Setup(repo => repo.GetBestAsync(request.Origin, request.Destination, It.IsAny<CancellationToken>()))
+            var bestRoute = new Route { Id = Guid.NewGuid(), OriginName = "GRU", DestinationName = "CDG", Value = 30 };
+            var bestRouteDto = bestRoute.Adapt<GetRouteResponseDto>();
+
+            _bestRouteServiceMock.Setup(repo => repo.GetBestRouteAsync(It.IsAny<GetRoutesModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bestRoute);
 
             // Act
-            var result = await _routeService.GetBestRouteAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.GetBestRouteAsync(request, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(bestRoute, result.Data);
+            Assert.Equivalent(bestRouteDto, result.Data);
         }
 
         [Fact]
         public async Task GetBestRouteAsync_ShouldReturnError_WhenNoRouteExists()
         {
             // Arrange
-            var request = new GetRoutesRequest { Origin = "GRU", Destination = "CDG" };
+            var request = new GetRoutesRequestDto { Origin = "GRU", Destination = "CDG" };
+            var requestModel = request.Adapt<GetRoutesModel>();
 
-            _routeRepositoryMock.Setup(repo => repo.GetBestAsync(request.Origin, request.Destination, It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.GetBestRouteAsync(requestModel, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Route?)null);
 
             // Act
-            var result = await _routeService.GetBestRouteAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.GetBestRouteAsync(request, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(Guid.Empty, result.Data.Id);
-            Assert.Contains("Nenhuma rota encontrada.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.NoRoutesFound, result.ErrorMessages);
         }
 
         [Fact]
         public async Task CreateRouteAsync_ShouldReturnCreatedRoute_WhenSuccessful()
         {
             // Arrange
-            var request = new CreateRouteRequest
+            var request = new CreateRouteRequestDto
             {
                 OriginName = "GRU",
                 DestinationName = "CDG",
                 Value = 30,
-                Connections = new List<CreateConnectionRequest>
+                Connections = new List<CreateConnectionRequestDto>
                 {
-                    new CreateConnectionRequest { Name = "SCL" }
+                    new CreateConnectionRequestDto { Name = "SCL" }
                 }
             };
 
@@ -161,41 +172,42 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
             };
 
             newRoute.Connections = connections;
+            var responseRoute = newRoute.Adapt<GetRouteResponseDto>();
 
-            _routeRepositoryMock.Setup(repo => repo.CreateAsync(It.IsAny<Route>(), It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.CreateRouteAsync(It.IsAny<CreateRouteModel>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(newRoute);
 
             // Act
-            var result = await _routeService.CreateRouteAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.CreateRouteAsync(request, CancellationToken.None);
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(newRoute, result.Data);
+            Assert.Equivalent(responseRoute, result.Data);
         }
 
         [Fact]
         public async Task CreateRouteAsync_ShouldReturnError_WhenCreationFails()
         {
             // Arrange
-            var request = new CreateRouteRequest
+            var request = new CreateRouteRequestDto
             {
                 OriginName = "GRU",
                 DestinationName = "CDG",
                 Value = 30,
-                Connections = new List<CreateConnectionRequest>
+                Connections = new List<CreateConnectionRequestDto>
                 {
-                    new CreateConnectionRequest { Name = "SCL" }
+                    new CreateConnectionRequestDto { Name = "SCL" }
                 }
             };
 
-            _routeRepositoryMock.Setup(repo => repo.CreateAsync(It.IsAny<Route>(), It.IsAny<CancellationToken>()))
+            _bestRouteServiceMock.Setup(repo => repo.CreateRouteAsync(It.IsAny<CreateRouteModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Route?)null);
 
             // Act
-            var result = await _routeService.CreateRouteAsync(request, CancellationToken.None);
+            var result = await _bestRoutesApplication.CreateRouteAsync(request, CancellationToken.None);
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(Guid.Empty, result.Data.Id);
-            Assert.Contains("Erro ao criar a rota.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.RouteCreationFailed, result.ErrorMessages);
         }
 
         [Fact]
@@ -203,14 +215,14 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
         {
             // Arrange
             var routeId = Guid.NewGuid();
-            var request = new CreateRouteRequest
+            var request = new UpdateRouteRequestDto
             {
                 OriginName = "GRU",
                 DestinationName = "CDG",
                 Value = 30,
-                Connections = new List<CreateConnectionRequest>
+                Connections = new List<CreateConnectionRequestDto>
                 {
-                    new CreateConnectionRequest { Name = "SCL" }
+                    new CreateConnectionRequestDto { Name = "SCL" }
                 }
             };
 
@@ -224,14 +236,18 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
                     new Connection { Id = Guid.NewGuid(), Name = "SCL", RouteId = routeId }
                 }
             };
-            _routeRepositoryMock.Setup(repo => repo.UpdateAsync(routeId, It.IsAny<Route>()))
+
+            var responseRoute = updatedRoute.Adapt<GetRouteResponseDto>();
+
+            _bestRouteServiceMock.Setup(repo => repo.UpdateRouteAsync(It.IsAny<UpdateRouteModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(updatedRoute);
+
             // Act
-            var result = await _routeService.UpdateRouteAsync(routeId, request);
+            var result = await _bestRoutesApplication.UpdateRouteAsync(routeId, request, It.IsAny<CancellationToken>());
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(updatedRoute, result.Data);
+            Assert.Equivalent(responseRoute, result.Data);
         }
 
         [Fact]
@@ -239,26 +255,28 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
         {
             // Arrange
             var routeId = Guid.NewGuid();
-            var request = new CreateRouteRequest
+            var request = new UpdateRouteRequestDto
             {
                 OriginName = "GRU",
                 DestinationName = "CDG",
                 Value = 30,
-                Connections = new List<CreateConnectionRequest>
+                Connections = new List<CreateConnectionRequestDto>
                 {
-                    new CreateConnectionRequest { Name = "SCL" }
+                    new CreateConnectionRequestDto { Name = "SCL" }
                 }
             };
-            _routeRepositoryMock.Setup(repo => repo.UpdateAsync(routeId, It.IsAny<Route>()))
+            var requestModel = request.Adapt<UpdateRouteModel>();
+
+            _bestRouteServiceMock.Setup(repo => repo.UpdateRouteAsync(requestModel, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Route?)null);
 
             // Act
-            var result = await _routeService.UpdateRouteAsync(routeId, request);
+            var result = await _bestRoutesApplication.UpdateRouteAsync(routeId, request, It.IsAny<CancellationToken>());
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(Guid.Empty, result.Data.Id);
-            Assert.Contains("Erro ao atualizar a rota. Verifique se a rota existe.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.RouteNotFound, result.ErrorMessages);
         }
 
         [Fact]
@@ -267,18 +285,18 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
             // Arrange
             var routeId = Guid.NewGuid();
 
-            _routeRepositoryMock.Setup(r => r.DeleteAsync(routeId))
+            _bestRouteServiceMock.Setup(r => r.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             // Act
-            var result = await _routeService.DeleteRouteAsync(routeId);
+            var result = await _bestRoutesApplication.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>());
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Contains("Rota deletada com sucesso.", result.Messages);
+            Assert.Contains(SuccessMessages.RouteDeleted, result.Messages);
             Assert.Empty(result.ErrorMessages);
 
-            _routeRepositoryMock.Verify(r => r.DeleteAsync(routeId), Times.Once);
+            _bestRouteServiceMock.Verify(r => r.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -286,17 +304,18 @@ namespace Airplane.Best.Routes.Api.UnitTests.Service
         {
             // Arrange
             var routeId = Guid.NewGuid();
-            _routeRepositoryMock.Setup(r => r.DeleteAsync(routeId))
+            _bestRouteServiceMock.Setup(r => r.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             // Act
-            var result = await _routeService.DeleteRouteAsync(routeId);
+            var result = await _bestRoutesApplication.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>());
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("Erro ao deletar a rota. Verifique se a rota existe.", result.ErrorMessages);
+            Assert.Contains(ErrorMessages.RouteNotFound, result.ErrorMessages);
             Assert.Empty(result.Messages);
-            _routeRepositoryMock.Verify(r => r.DeleteAsync(routeId), Times.Once);
+            _bestRouteServiceMock.Verify(r => r.DeleteRouteAsync(routeId, It.IsAny<CancellationToken>()), Times.Once);
         }
+
     }
 }

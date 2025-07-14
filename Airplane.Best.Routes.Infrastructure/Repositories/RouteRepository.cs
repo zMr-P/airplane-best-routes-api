@@ -1,109 +1,132 @@
 ﻿using Airplane.Best.Routes.Domain.Entities;
 using Airplane.Best.Routes.Domain.Interfaces.Context;
 using Airplane.Best.Routes.Domain.Interfaces.Repositories;
+using Airplane.Best.Routes.Domain.Messages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Airplane.Best.Routes.Infrastructure.Repositories
 {
     public class RouteRepository : IRouteRepository
     {
         private readonly IMemoryContext _memoryContext;
+        private readonly ILogger<RouteRepository> _logger;
 
-        public RouteRepository(IMemoryContext memoryContext)
+        public RouteRepository(IMemoryContext memoryContext, ILogger<RouteRepository> logger)
         {
             _memoryContext = memoryContext;
+            _logger = logger;
         }
 
-        public async Task<List<Route>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<Route>?> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _memoryContext.Routes
-                .Include(r => r.Connections)
-                .ToListAsync(cancellationToken);
+            try
+            {
+                return await _memoryContext.Routes
+                    .Include(r => r.Connections)
+                    .ToListAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionGetAllRoutes);
+                return null;
+            }
         }
 
-        public async Task<List<Route>> GetRangeAsync(string originName, string destinationName, CancellationToken cancellationToken)
+        public async Task<Route?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _memoryContext.Routes
-                .Where(r => r.OriginName == originName && r.DestinationName == destinationName)
-                .Include(r => r.Connections)
-                .ToListAsync(cancellationToken);
+            try
+            {
+                return await _memoryContext.Routes
+                    .Include(r => r.Connections)
+                    .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionGetRouteById);
+                return null;
+            }
+        }
+
+        public async Task<List<Route>?> GetRangeAsync(string originName, string destinationName, CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await _memoryContext.Routes
+                    .Where(r => r.OriginName == originName && r.DestinationName == destinationName)
+                    .Include(r => r.Connections)
+                    .ToListAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionGetRoutesByOriginAndDestination);
+                return null;
+            }
         }
 
         public async Task<Route?> GetBestAsync(string originName, string destinationName, CancellationToken cancellationToken)
         {
-            return await _memoryContext.Routes
-                .Where(r => r.OriginName == originName && r.DestinationName == destinationName)
-                .OrderBy(r => r.Value)
-                .Include(r => r.Connections)
-                .FirstOrDefaultAsync(cancellationToken);
-        }
-
-        public async Task<Route> CreateAsync(Route route, CancellationToken cancellationToken)
-        {
-            route.Id = Guid.NewGuid();
-            foreach (var connection in route.Connections)
+            try
             {
-                connection.Id = Guid.NewGuid();
-                connection.RouteId = route.Id;
+                return await _memoryContext.Routes
+                    .Where(r => r.OriginName == originName && r.DestinationName == destinationName)
+                    .OrderBy(r => r.Value)
+                    .Include(r => r.Connections)
+                    .FirstOrDefaultAsync(cancellationToken);
             }
-
-            var createdRoute = await _memoryContext.Routes.AddAsync(route, cancellationToken);
-            await _memoryContext.SaveChangesAsync();
-
-            return createdRoute.Entity;
-        }
-
-        public async Task<Route?> UpdateAsync(Guid id, Route newRoute)
-        {
-            var dataRoute = await _memoryContext.Routes
-                .Include(r => r.Connections)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (dataRoute == null)
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionGetBestRouteByOriginAndDestination);
                 return null;
-
-            dataRoute.OriginName = newRoute.OriginName;
-            dataRoute.DestinationName = newRoute.DestinationName;
-            dataRoute.Value = newRoute.Value;
-
-            if (dataRoute.Connections != null && dataRoute.Connections.Any())
-            {
-                foreach (var conn in dataRoute.Connections.ToList())
-                {
-                    _memoryContext.Connections.Remove(conn);
-                }
             }
-
-            dataRoute.Connections = new List<Connection>();
-
-            foreach (var connection in newRoute.Connections)
-            {
-                var newConnection = new Connection
-                {
-                    Id = Guid.NewGuid(),
-                    RouteId = dataRoute.Id,
-                    Name = connection.Name
-                };
-                dataRoute.Connections.Add(newConnection);
-                _memoryContext.Connections.Add(newConnection);
-            }
-
-            await _memoryContext.SaveChangesAsync();
-
-            return dataRoute;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<Route?> CreateAsync(Route route, CancellationToken cancellationToken)
         {
-            var route = await _memoryContext.Routes.FirstOrDefaultAsync(r => r.Id == id);
+            try
+            {
+                var createdRoute = await _memoryContext.Routes.AddAsync(route, cancellationToken);
+                await _memoryContext.SaveChangesAsync();
 
-            if (route == null)
-                return false;
+                return createdRoute.Entity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionCreateRoute);
+                return null;
+            }
+        }
 
-            _memoryContext.Routes.Remove(route);
-            await _memoryContext.SaveChangesAsync();
+        public async Task<Route?> UpdateAsync(Route newRoute)
+        {
+            try
+            {
+                var updatedRoute = _memoryContext.Routes.Update(newRoute);
+                await _memoryContext.SaveChangesAsync();
 
-            return true;
+                return updatedRoute.Entity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionUpdateRoute);
+                return null;
+            }
+        }
+
+        public async Task<bool?> DeleteAsync(Route routeToDelete)
+        {
+            try
+            {
+                _memoryContext.Routes.Remove(routeToDelete);
+                await _memoryContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ExceptionMessages.ExceptionDeleteRoute);
+                return null;
+            }
         }
     }
 }

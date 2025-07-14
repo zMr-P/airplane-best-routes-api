@@ -1,6 +1,8 @@
 using Airplane.Best.Routes.Application.Mapper;
 using Airplane.Best.Routes.Infrastructure.Ioc.Builder;
 using Airplane.Best.Routes.Infrastructure.Ioc.Extensions;
+using airplane_best_routes_api.Routing;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace airplane_best_routes_api
 {
@@ -12,7 +14,10 @@ namespace airplane_best_routes_api
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseTransformer()));
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
@@ -21,6 +26,7 @@ namespace airplane_best_routes_api
             builder.Services.SetContextConfig();
             builder.Services.SetRepositoriesConfig();
             builder.Services.SetServicesConfig();
+            builder.Services.SetApplicationConfig();
             MapsterProfile.RegisterMappings();
 
 
